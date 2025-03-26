@@ -34,3 +34,6 @@ def XNOR(x1, x2):
   s2 = OR(x1, x2)
   y = NAND(s1, s2)
   return y
+
+def EQUAL(x1, x2):
+  return XNOR(x1, x2)
