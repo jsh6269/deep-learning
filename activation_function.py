@@ -16,8 +16,12 @@ def leaky_relu(x, alpha=0.01):
 def tanh(x):
   return np.tanh(x)
 
+def softmax(x):
+  exp_x = np.exp(x)
+  return exp_x / np.sum(exp_x)
+
 if __name__ == "__main__":
   a, b = np.array([3]), np.array([1, -2, 3])
-  for func in [step_function, sigmoid, relu, leaky_relu, tanh]:
+  for func in [step_function, sigmoid, relu, leaky_relu, tanh, softmax]:
     print(func(a))
     print(func(b))
