@@ -5,6 +5,7 @@ sys.path.append(os.pardir)
 
 from dataset.mnist import load_mnist
 from network import TwoLayerNet
+from optimizer import *
 
 # load data
 (x_train, t_train), (x_test, t_test) = load_mnist(normalize=True, one_hot_label=True)
@@ -22,6 +23,7 @@ test_acc_list = []
 
 # init network
 network = TwoLayerNet(input_size=784, hidden_size=50, output_size=10)
+optimizer = Adam()
 
 for i in range(iters_num):
     # mini batch
@@ -30,11 +32,10 @@ for i in range(iters_num):
     t_batch = t_train[batch_mask]
 
     # calculate gradient
-    grad = network.gradient(x_batch, t_batch)
+    grads = network.gradient(x_batch, t_batch)
 
     # gradient descent
-    for key in ('W1', 'b1', 'W2', 'b2'):
-        network.params[key] -= learning_rate * grad[key]
+    optimizer.update(network.params, grads)
 
     # calculate loss
     loss = network.loss(x_batch, t_batch)
