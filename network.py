@@ -8,6 +8,7 @@ from relu import Relu
 from affine import Affine
 from softmax import SoftmaxWithLoss
 from batchnorm import BatchNormalization
+from dropout import Dropout
 from gradient import numerical_gradient
 
 
@@ -27,16 +28,20 @@ class TwoLayerNet:
         self.layers['Affine1'] = Affine(self.params['W1'], self.params['b1'])
         self.layers['BatchNorm1'] = BatchNormalization(self.params['gamma1'], self.params['beta1'])
         self.layers['Relu1'] = Relu()
+        self.layers['Dropout1'] = Dropout(0.2)
         self.layers['Affine2'] = Affine(self.params['W2'], self.params['b2'])
         self.lastLayer = SoftmaxWithLoss()
 
-    def predict(self, x):
-        for layer in self.layers.values():
-            x = layer.forward(x)
+    def predict(self, x, train_flag=False):
+        for key, layer in self.layers.items():
+            if "Dropout" in key or "BatchNorm" in key:
+                x = layer.forward(x, train_flag)
+            else:
+                x = layer.forward(x)
         return x
 
-    def loss(self, x, t):
-        y = self.predict(x)
+    def loss(self, x, t, train_flag=False):
+        y = self.predict(x, train_flag)
         return self.lastLayer.forward(y, t)
 
     def accuracy(self, x, t):
@@ -49,7 +54,7 @@ class TwoLayerNet:
         return accuracy
 
     def numerical_gradient(self, x, t):
-        loss_W = lambda W: self.loss(x, t)
+        loss_W = lambda W: self.loss(x, t, train_flag=True)
 
         grads = {}
         grads['W1'] = numerical_gradient(loss_W, self.params['W1'])
@@ -63,7 +68,7 @@ class TwoLayerNet:
 
     def gradient(self, x, t):
         # forward propagation
-        self.loss(x, t)
+        self.loss(x, t, train_flag=True)
 
         # back propagation
         dout = 1
