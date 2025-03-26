@@ -17,7 +17,8 @@ def tanh(x):
   return np.tanh(x)
 
 def softmax(x):
-  exp_x = np.exp(x)
+  c = np.max(x)
+  exp_x = np.exp(x - c)
   return exp_x / np.sum(exp_x)
 
 if __name__ == "__main__":
