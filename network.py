@@ -5,7 +5,7 @@ from collections import OrderedDict
 sys.path.append(os.pardir)
 
 from affine import Affine
-from softmax_with_loss import SoftmaxWithLoss
+from softmax import SoftmaxWithLoss
 from relu import Relu
 from gradient import numerical_gradient
 

@@ -1,6 +1,16 @@
 import numpy as np
-from activation_function import softmax
 from loss import cross_entropy_loss
+
+def softmax(x):
+	if x.ndim == 2:
+		x = x.T
+		x = x - np.max(x, axis=0)
+		y = np.exp(x) / np.sum(np.exp(x), axis=0)
+		return y.T
+
+	x = x - np.max(x) # prevent overflow
+	return np.exp(x) / np.sum(np.exp(x))
+
 
 class SoftmaxWithLoss:
     def __init__(self):
