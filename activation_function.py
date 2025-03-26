@@ -17,12 +17,19 @@ def tanh(x):
   return np.tanh(x)
 
 def softmax(x):
-  c = np.max(x)
-  exp_x = np.exp(x - c)
-  return exp_x / np.sum(exp_x)
+    if x.ndim == 2:
+        x = x.T
+        x = x - np.max(x, axis=0)
+        y = np.exp(x) / np.sum(np.exp(x), axis=0)
+        return y.T 
+
+    x = x - np.max(x) # prevent overflow
+    return np.exp(x) / np.sum(np.exp(x))
+
 
 if __name__ == "__main__":
   a, b = np.array([3]), np.array([1, -2, 3])
+
   for func in [step_function, sigmoid, relu, leaky_relu, tanh, softmax]:
     print(func(a))
     print(func(b))
