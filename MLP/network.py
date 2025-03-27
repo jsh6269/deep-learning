@@ -4,12 +4,13 @@ import numpy as np
 from collections import OrderedDict
 sys.path.append(os.pardir)
 
-from common.relu import Relu
-from common.affine import Affine
-from common.softmax import SoftmaxWithLoss
-from batchnorm import BatchNormalization
 from dropout import Dropout
-from common.gradient import numerical_gradient
+from batchnorm import BatchNormalization
+
+from _common.relu import Relu
+from _common.affine import Affine
+from _common.softmax import SoftmaxWithLoss
+from _common.gradient import numerical_gradient
 
 
 class TwoLayerNet:

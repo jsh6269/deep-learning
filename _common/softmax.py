@@ -1,5 +1,5 @@
 import numpy as np
-from common.loss import cross_entropy_loss
+from _common.loss import cross_entropy_loss
 
 def softmax(x):
 	if x.ndim == 2:

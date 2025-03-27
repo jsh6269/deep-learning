@@ -3,9 +3,9 @@ import os
 import numpy as np
 sys.path.append(os.pardir)
 
-from dataset.mnist import load_mnist
 from network import TwoLayerNet
-from common.optimizer import *
+from _common.optimizer import *
+from _dataset.mnist import load_mnist
 
 # load data
 (x_train, t_train), (x_test, t_test) = load_mnist(normalize=True, one_hot_label=True)

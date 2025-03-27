@@ -1,16 +1,17 @@
 import sys, os
 sys.path.append(os.pardir)
+
 import pickle
 import numpy as np
 from collections import OrderedDict
 
-from convolution import Convolution
 from pooling import Pooling
+from convolution import Convolution
 
-from common.gradient import numerical_gradient
-from common.relu import Relu
-from common.softmax import SoftmaxWithLoss
-from common.affine import Affine
+from _common.relu import Relu
+from _common.affine import Affine
+from _common.softmax import SoftmaxWithLoss
+from _common.gradient import numerical_gradient
 
 
 class ConvNet:

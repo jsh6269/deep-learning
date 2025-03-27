@@ -3,9 +3,10 @@ sys.path.append(os.pardir)
 
 import numpy as np
 import matplotlib.pyplot as plt
-from dataset.mnist import load_mnist
+
 from network import ConvNet
-from common.trainer import Trainer
+from _common.trainer import Trainer
+from _dataset.mnist import load_mnist
 
 # load data
 (x_train, t_train), (x_test, t_test) = load_mnist(flatten=False)
