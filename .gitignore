@@ -1,2 +1,5 @@
 __pycache__/
-MLP/dataset/__pycache__/
+common/__pycache__/
+dataset/__pycache__/
+MLP/__pycache__/
+ConvNet/__pycache__/

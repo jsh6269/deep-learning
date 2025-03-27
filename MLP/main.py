@@ -5,7 +5,7 @@ sys.path.append(os.pardir)
 
 from dataset.mnist import load_mnist
 from network import TwoLayerNet
-from optimizer import *
+from common.optimizer import *
 
 # load data
 (x_train, t_train), (x_test, t_test) = load_mnist(normalize=True, one_hot_label=True)
