@@ -5,7 +5,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 from network import ConvNet
-from _common.trainer import Trainer
+from _common.trainer import Trainer1
 from _dataset.mnist import load_mnist
 
 # load data
@@ -21,7 +21,7 @@ network = ConvNet(input_dim=(1,28,28),
                         conv_param = {'filter_num': 30, 'filter_size': 5, 'pad': 0, 'stride': 1},
                         hidden_size=100, output_size=10, weight_init_std=0.01)
                         
-trainer = Trainer(network, x_train, t_train, x_test, t_test,
+trainer = Trainer1(network, x_train, t_train, x_test, t_test,
                   epochs=max_epochs, mini_batch_size=100,
                   optimizer='Adam', optimizer_param={'lr': 0.001},
                   evaluate_sample_num_per_epoch=1000, verbose=False)
