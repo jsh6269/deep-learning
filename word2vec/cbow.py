@@ -1,26 +1,29 @@
 import sys
 sys.path.append('..')
+
 import numpy as np
-from _common.matmul import MatMul
-from _common.softmax import SoftmaxWithLoss
+from embedding import Embedding
+from word2vec.negative_sampling import NegativeSamplingLoss
 
 
 class CBOW:
-    def __init__(self, vocab_size, hidden_size):
+    def __init__(self, vocab_size, hidden_size, window_size, corpus):
         V, H = vocab_size, hidden_size
 
         # 가중치 초기화
         W_in = 0.01 * np.random.randn(V, H).astype('f')
-        W_out = 0.01 * np.random.randn(H, V).astype('f')
+        W_out = 0.01 * np.random.randn(V, H).astype('f')
 
         # 계층 생성
-        self.in_layer0 = MatMul(W_in)
-        self.in_layer1 = MatMul(W_in)
-        self.out_layer = MatMul(W_out)
-        self.loss_layer = SoftmaxWithLoss()
+        self.in_layers = []
+        for i in range(2 * window_size):
+            layer = Embedding(W_in)  # Embedding 계층 사용
+            self.in_layers.append(layer)
 
-        # 모든 가중치와 기울기를 리스트에 모은다.
-        layers = [self.in_layer0, self.in_layer1, self.out_layer]
+        self.ns_loss = NegativeSamplingLoss(W_out, corpus, power=0.75, sample_size=5)
+
+        # 모든 가중치와 기울기를 배열에 모은다.
+        layers = self.in_layers + [self.ns_loss]
         self.params, self.grads = [], []
         for layer in layers:
             self.params += layer.params
@@ -30,17 +33,17 @@ class CBOW:
         self.word_vecs = W_in
 
     def forward(self, contexts, target):
-        h0 = self.in_layer0.forward(contexts[:, 0])
-        h1 = self.in_layer1.forward(contexts[:, 1])
-        h = (h0 + h1) * 0.5
-        score = self.out_layer.forward(h)
-        loss = self.loss_layer.forward(score, target)
+        h = 0
+        for i, layer in enumerate(self.in_layers):
+            h += layer.forward(contexts[:, i])
+        h *= 1 / len(self.in_layers)
+        loss = self.ns_loss.forward(h, target)
         return loss
 
     def backward(self, dout=1):
-        ds = self.loss_layer.backward(dout)
-        da = self.out_layer.backward(ds)
-        da *= 0.5
-        self.in_layer1.backward(da)
-        self.in_layer0.backward(da)
+        dout = self.ns_loss.backward(dout)
+        dout *= 1 / len(self.in_layers)
+        for layer in self.in_layers:
+            layer.backward(dout)
         return None
+    
