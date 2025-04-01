@@ -1,7 +1,7 @@
 import sys
 sys.path.append('..')
 import numpy as np
-from lstm import TimeLSTM
+from LSTM.lstm import TimeLSTM
 from RNN.embedding import TimeEmbedding
 from RNN.affine import TimeAffine
 from RNN.softmax import TimeSoftmaxWithLoss
@@ -10,7 +10,16 @@ from _common.base_model import BaseModel
 
 
 class Rnnlm(BaseModel):
-    def __init__(self, vocab_size=10000, wordvec_size=100, hidden_size=100, dropout_ratio=0.5):
+    '''
+     LSTM 계층을 2개 사용하고 각 층에 드롭아웃을 적용한 모델이다.
+     아래 [1]에서 제안한 모델을 기초로 하였고, [2]와 [3]의 가중치 공유(weight tying)를 적용했다.
+
+     [1] Recurrent Neural Network Regularization (https://arxiv.org/abs/1409.2329)
+     [2] Using the Output Embedding to Improve Language Models (https://arxiv.org/abs/1608.05859)
+     [3] Tying Word Vectors and Word Classifiers (https://arxiv.org/pdf/1611.01462.pdf)
+    '''
+    def __init__(self, vocab_size=10000, wordvec_size=650,
+                 hidden_size=650, dropout_ratio=0.5):
         V, D, H = vocab_size, wordvec_size, hidden_size
         rn = np.random.randn
 
@@ -33,21 +42,24 @@ class Rnnlm(BaseModel):
             TimeAffine(embed_W.T, affine_b)  # weight tying!!
         ]
         self.loss_layer = TimeSoftmaxWithLoss()
-        self.lstm_layer = self.layers[1]
+        self.lstm_layers = [self.layers[2], self.layers[4]]
+        self.drop_layers = [self.layers[1], self.layers[3], self.layers[5]]
 
-        # 모든 가중치와 기울기를 리스트에 모은다.
         self.params, self.grads = [], []
         for layer in self.layers:
             self.params += layer.params
             self.grads += layer.grads
 
-    def predict(self, xs):
+    def predict(self, xs, train_flg=False):
+        for layer in self.drop_layers:
+            layer.train_flg = train_flg
+
         for layer in self.layers:
             xs = layer.forward(xs)
         return xs
 
-    def forward(self, xs, ts):
-        score = self.predict(xs)
+    def forward(self, xs, ts, train_flg=True):
+        score = self.predict(xs, train_flg)
         loss = self.loss_layer.forward(score, ts)
         return loss
 
@@ -58,4 +70,5 @@ class Rnnlm(BaseModel):
         return dout
 
     def reset_state(self):
-        self.lstm_layer.reset_state()
+        for layer in self.lstm_layers:
+            layer.reset_state()
