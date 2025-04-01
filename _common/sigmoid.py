@@ -1,6 +1,11 @@
 import numpy as np
 from _common.loss import cross_entropy_loss
 
+
+def sigmoid(x):
+	return 1 / (1 + np.exp(-x))
+
+
 class SigmoidWithLoss:
     def __init__(self):
         self.params, self.grads = [], []
