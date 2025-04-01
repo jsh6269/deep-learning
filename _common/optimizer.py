@@ -1,12 +1,16 @@
 import numpy as np
 
 class SGD:
-	def __init__(self, lr=0.01):
-		self.lr = lr
+    def __init__(self, lr=0.01):
+        self.lr = lr
 
-	def update(self, params, grads):
-		for key in params.keys():
-			params[key] -= self.lr * grads[key]
+    def update(self, params, grads):
+        if isinstance(params, dict):
+            for key in params.keys():
+                params[key] -= self.lr * grads[key]
+        elif isinstance(params, list):
+            for i in range(len(params)):
+                params[i] -= self.lr * grads[i]
 
 
 class Momentum:
