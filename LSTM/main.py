@@ -15,6 +15,7 @@ time_size = 35     # RNN을 펼치는 크기
 lr = 20.0
 max_epoch = 4
 max_grad = 0.25
+dropout = 0.5
 
 # 학습 데이터 읽기
 corpus, word_to_id, id_to_word = ptb.load_data('train')
@@ -24,7 +25,7 @@ xs = corpus[:-1]
 ts = corpus[1:]
 
 # 모델 생성
-model = Rnnlm(vocab_size, wordvec_size, hidden_size)
+model = Rnnlm(vocab_size, wordvec_size, hidden_size, dropout)
 optimizer = SGD(lr)
 trainer = RnnlmTrainer(model, optimizer)
 
