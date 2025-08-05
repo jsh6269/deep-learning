@@ -153,7 +153,7 @@ class Diffuser:
 
         model.eval()
         with torch.no_grad():
-            eps = model(x, t, labels)  # add lable embedding
+            eps = model(x, t, labels)  # add label embedding
         model.train()
 
         noise = torch.randn_like(x, device=self.device)
