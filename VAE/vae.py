@@ -6,6 +6,8 @@ import torch.optim as optim
 import torchvision
 from torchvision import datasets, transforms
 
+# device setting
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 # hyperparameters
 input_dim = 784  # x dimension
@@ -71,13 +73,14 @@ class VAE(nn.Module):
 
 # datasets
 transform = transforms.Compose([
-                transforms.ToTensor(),
-                transforms.Lambda(torch.flatten) # falatten
-            ])
+    transforms.ToTensor(),
+    transforms.Lambda(torch.flatten)  # flatten
+])
+
 dataset = datasets.MNIST(root='./data', train=True, download=True, transform=transform)
 dataloader = torch.utils.data.DataLoader(dataset, batch_size=batch_size, shuffle=True)
 
-model = VAE(input_dim, hidden_dim, latent_dim)
+model = VAE(input_dim, hidden_dim, latent_dim).to(device)
 optimizer = optim.Adam(model.parameters(), lr=learning_rate)
 losses = []
 
@@ -86,6 +89,7 @@ for epoch in range(epochs):
     cnt = 0
 
     for x, label in dataloader:
+        x = x.to(device)
         optimizer.zero_grad()
         loss = model.get_loss(x)
         loss.backward()
@@ -99,21 +103,20 @@ for epoch in range(epochs):
     losses.append(loss_avg)
 
 # plot losses
-epochs = list(range(1, epochs + 1))
-plt.plot(epochs, losses, marker='o', linestyle='-')
+epoch_range = list(range(1, epochs + 1))
+plt.plot(epoch_range, losses, marker='o', linestyle='-')
 plt.xlabel('Epoch')
 plt.ylabel('Loss')
 plt.show()
 
-
 # generate new images
 with torch.no_grad():
     sample_size = 64
-    z = torch.randn(sample_size, latent_dim)
+    z = torch.randn(sample_size, latent_dim).to(device)
     x = model.decoder(z)
-    generated_images = x.view(sample_size, 1, 28, 28)
+    generated_images = x.view(sample_size, 1, 28, 28).cpu()
 
 grid_img = torchvision.utils.make_grid(generated_images, nrow=8, padding=2, normalize=True)
 plt.imshow(grid_img.permute(1, 2, 0))
 plt.axis('off')
-plt.show()
+plt.savefig('./generated.png')
